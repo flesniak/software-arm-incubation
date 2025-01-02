@@ -115,8 +115,8 @@ void ioTest()
 void initSerial()
 {
 #ifdef DEBUG_SERIAL
-    serial.setRxPin(PIO2_7);
-    serial.setTxPin(PIO2_8);
+    serial.setRxPin(APP_OUT8X_PIN_DEBUG_RX);
+    serial.setTxPin(APP_OUT8X_PIN_DEBUG_TX);
     serial.begin(115200);
     serial.println("out8 serial debug started");
 #endif
@@ -156,12 +156,12 @@ void startBusVoltageMonitoring()
         {
             delay(1);
 #           ifdef DEBUG
-                digitalWrite(PIN_RUN, !digitalRead(PIN_RUN));
+                digitalWrite(APP_OUT8X_PIN_RUN, !digitalRead(APP_OUT8X_PIN_RUN));
 #           endif
             printSerialBusVoltage(100);
         }
 #       ifdef DEBUG
-            digitalWrite(PIN_RUN, 1);
+            digitalWrite(APP_OUT8X_PIN_RUN, 1);
 #       endif
     }
 #endif
@@ -175,9 +175,9 @@ bool recallAppData()
     if (!result)
     {
 #   ifdef DEBUG
-        digitalWrite(PIN_INFO, 1);
+        digitalWrite(APP_OUT8X_PIN_INFO, 1);
         delay(1000);
-        digitalWrite(PIN_INFO, 0);
+        digitalWrite(APP_OUT8X_PIN_INFO, 0);
 #   endif
     }
 #endif
@@ -190,12 +190,12 @@ bool recallAppData()
 BcuBase* setup()
 {
     // first set pin mode for Info & Run LED
-    pinMode(PIN_INFO, OUTPUT); // this also sets pin to high/true
-    pinMode(PIN_RUN, OUTPUT); // this also sets pin to high/true
+    pinMode(APP_OUT8X_PIN_INFO, OUTPUT | OPEN_DRAIN); // this also sets pin to high/true
+    pinMode(APP_OUT8X_PIN_RUN, OUTPUT | OPEN_DRAIN); // this also sets pin to high/true
     // then set values
-    digitalWrite(PIN_INFO, 0);
+    digitalWrite(APP_OUT8X_PIN_INFO, 0);
 #ifdef DEBUG
-    digitalWrite(PIN_RUN, 1);
+    digitalWrite(APP_OUT8X_PIN_RUN, 1);
 #endif
 
     // Configure the output pins
@@ -211,7 +211,7 @@ BcuBase* setup()
 #endif
 
 #ifdef DEBUG_SERIAL
-    int physicalAddress = bus.ownAddress();
+    int physicalAddress = bcu.ownAddress();
     serial.print("physical address: ", (physicalAddress >> 12) & 0x0F, DEC);
     serial.print(".", (physicalAddress >> 8) & 0x0F, DEC);
     serial.println(".", physicalAddress & 0xFF, DEC);
@@ -287,22 +287,22 @@ bool saveRelayState()
 
 void AppCallback::BusVoltageFail()
 {
-    pinMode(PIN_INFO, OUTPUT); // even in non DEBUG flash Info LED to display app data storing
-    digitalWrite(PIN_INFO, 1);
+    pinMode(APP_OUT8X_PIN_INFO, OUTPUT | OPEN_DRAIN); // even in non DEBUG flash Info LED to display app data storing
+    digitalWrite(APP_OUT8X_PIN_INFO, 1);
 
     // write application settings to flash
-    digitalWrite(PIN_INFO, !saveRelayState());
+    digitalWrite(APP_OUT8X_PIN_INFO, !saveRelayState());
     stopApplication();
 
 #ifdef DEBUG
-    digitalWrite(PIN_RUN, 0); // switch RUN-LED off, to save some power
+    digitalWrite(APP_OUT8X_PIN_RUN, 0); // switch RUN-LED off, to save some power
 #endif
 }
 
 void AppCallback::BusVoltageReturn()
 {
 #ifdef DEBUG
-    digitalWrite(PIN_RUN, 1); // switch RUN-LED ON
+    digitalWrite(APP_OUT8X_PIN_RUN, 1); // switch RUN-LED ON
 #endif
     //restore application settings
     if (!recallAppData()) // load custom application settings

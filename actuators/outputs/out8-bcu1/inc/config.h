@@ -80,6 +80,16 @@
  */
 //#define MU_V1XX
 
+/**
+ * @def APP_OUT_8X_16A_BISTAB_4MU_KICAD
+ * Updated KiCad port of app_out_8x_16A_bistab_4MU, version >= 2.3 with P1 pinout matching application board
+ * @note PCBs:<br>
+ *       https://github.com/selfbus/hardware-merged/tree/main/applications_din/in-out_2x-2x_2MU<br>
+ *       https://github.com/selfbus/hardware-merged/tree/main/controller_lpc1115/lpc1115_2MU_MID
+ */
+// #define APP_OUT_8X_16A_BISTAB_4MU_KICAD
+// #define APP_OUT_8X_16A_BISTAB_4MU_KICAD_BETA // the engineering prototype
+
 /*
  *  hand actuation pin configuration
  */
@@ -97,7 +107,6 @@
 /*
  *  bus power-failure configuration
  *  Use 1% tolerance or better resistors for the voltage divider R3 & R12 on 4TE controller & TS_ARM
- *  TODO change resistors R3 & R12 tolerance in schematic to 1%
  */
 #ifdef BUSFAIL
 #   define VBUS_AD_PIN PIN_VBUS
@@ -178,12 +187,56 @@
         // Wiki: https://selfbus.org/wiki/devices/outputs/25-switching-actuator-8x-230v-16a-4module-units
         const int outputPins[NO_OF_OUTPUTS] =
         {
+#           ifdef APP_OUT_8X_16A_BISTAB_SEPERATED_4MU
+
+            /*
+            * PIN configuration for application hardware "out_8x_16A_bistab_seperated_4MU"
+            * (this hardware was named before as "out8_16A_V2.3")
+            */
+            // RESET Pin, SET Pin
+            PIN_IO5,  PIN_IO7,  // Kanal 1
+            PIN_IO4,  PIN_IO3,  // Kanal 2
+            PIN_PWM,  PIN_APRG, // Kanal 3
+            PIN_IO2,  PIN_IO1,  // Kanal 4
+            PIN_IO10, PIN_RX,   // Kanal 5
+            PIN_TX,   PIN_IO11, // Kanal 6
+            PIN_IO14, PIN_IO15, // Kanal 7
+            PIN_IO9,  PIN_IO13  // Kanal 8
+
+#           elif defined(APP_OUT_8X_16A_BISTAB_4MU_KICAD_BETA)
+
+            // pin configuration for application board "out_8x_16A_bistab_seperated_4MU_kicad" version <= 2.3
+            // RESET Pin, SET Pin
+            PIN_IO3,  PIN_IO2,  //  1,  2 => K1 reset/set
+            PIN_IO5,  PIO_SDA,  //  3,  4 => K2 reset/set // PIO_SDA-> pull-up resistor!
+            PIN_IO4,  PIN_IO1,  //  5,  6 => K3 reset/set
+            PIN_PWM,  PIN_APRG, //  7,  8 => K4 reset/set
+            PIN_IO11, PIN_TX,   //  9, 10 => K5 reset/set
+            PIN_IO9,  PIN_IO13, // 11, 12 => K6 reset/set
+            PIN_IO10, PIN_RX,   // 13, 14 => K7 reset/set
+            PIN_IO14, PIN_IO15, // 15, 16 => K8 reset/set
+
+#           elif defined(APP_OUT_8X_16A_BISTAB_4MU_KICAD)
+
+            // pin configuration for application board "out_8x_16A_bistab_seperated_4MU_kicad" version >= 2.4
+            // RESET Pin, SET Pin
+            PIN_IO7,  PIN_IO6,  //  1,  2 => K1 reset/set
+            PIN_IO5,  PIN_IO4,  //  3,  4 => K2 reset/set
+            PIN_IO3,  PIN_IO2,  //  5,  6 => K3 reset/set
+            PIN_IO1,  PIN_PWM,  //  7,  8 => K4 reset/set
+            PIN_IO15, PIN_IO14, //  9, 10 => K5 reset/set
+            PIN_IO13, PIN_IO12, // 11, 12 => K6 reset/set
+            PIN_IO11, PIN_IO10, // 13, 14 => K7 reset/set
+            PIN_IO9,  PIN_IO8   // 15, 16 => K8 reset/set
+
+#           else
+
             /*
              * PIO_SDA=PIO0_5 PIO0_5 is a open-drain pin & needs a pull-up resistor
              * see LPC user manual page 79 chapter 7.4.12 IOCON_PIO0_5.
              * better solution would be to use IO7 instead.
              */
-#            ifndef APP_OUT_8X_16A_BISTAB_SEPERATED_4MU
+
             // K1 -> K4
             PIN_IO2,  PIN_IO3,  //  1,  2 => K1 reset/set
             PIN_IO5,  PIO_SDA,  //  3,  4 => K2 reset/set // PIO_SDA-> pull-up resistor!
@@ -196,25 +249,19 @@
             PIN_IO14, PIN_IO15, // 11, 12 => K6 reset/set
             PIN_IO9,  PIN_IO13  //  9, 10 => K5 reset/set
 
-#            else
-            /*
-            * PIN configuration for application hardware "out_8x_16A_bistab_seperated_4MU"
-            * (this hardware was named before as "out8_16A_V2.3")
-            */
-
-         // RESET Pin,SET Pin
-            PIN_IO5,  PIN_IO7,  // Kanal 1
-            PIN_IO4,  PIN_IO3,  // Kanal 2
-            PIN_PWM,  PIN_APRG, // Kanal 3
-            PIN_IO2,  PIN_IO1,  // Kanal 4
-
-            PIN_IO10, PIN_RX,   // Kanal 5
-            PIN_TX,   PIN_IO11, // Kanal 6
-            PIN_IO14, PIN_IO15, // Kanal 7
-            PIN_IO9,  PIN_IO13  // Kanal 8
-
-#       endif
+#           endif
         };
+
+        #if defined(APP_OUT_8X_16A_BISTAB_4MU_KICAD) || defined(APP_OUT_8X_16A_BISTAB_4MU_KICAD_BETA) // new out8 has RUN/INFO on different IOs
+            #define APP_OUT8X_PIN_INFO PIO2_8
+            #define APP_OUT8X_PIN_RUN  PIO2_0
+        #else
+            #define APP_OUT8X_PIN_INFO PIN_INFO
+            #define APP_OUT8X_PIN_RUN  PIN_RUN
+        #endif
+
+        #define APP_OUT8X_PIN_DEBUG_RX PIO1_6
+        #define APP_OUT8X_PIN_DEBUG_TX PIO1_7
 
         /*
          * DONE check which bi-stable configuration this should be?

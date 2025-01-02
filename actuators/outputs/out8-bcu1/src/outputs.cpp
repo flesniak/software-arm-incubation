@@ -17,6 +17,10 @@
     Outputs relays;
 #endif
 
+#ifdef DEBUG_SERIAL
+#    include <sblib/serial.h>
+#endif
+
 const unsigned int zeroDetectSetDelay = 512; // 5.12 milliseconds Omron G5Q-1A EU 10A set
 const unsigned int zeroDetectClrDelay = 576; // 5.76 milliseconds Omron G5Q-1A EU 10A clear
 
@@ -80,6 +84,13 @@ void Outputs::setupOutputs(const int* Pins, const unsigned int pinCount)
     _pinCount = pinCount;
     for (unsigned int channel = 0; channel < outputCount(); channel++)
     {
+#ifdef DEBUG_SERIAL
+        if (outputPins[channel] == APP_OUT8X_PIN_DEBUG_RX || outputPins[channel] == APP_OUT8X_PIN_DEBUG_TX)
+        {
+            serial.println("skip output setup for debug pins");
+            continue;
+        }
+#endif
         pinMode(outputPins[channel], OUTPUT);
         digitalWrite(outputPins[channel], 0);
     }

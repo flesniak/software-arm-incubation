@@ -1,5 +1,5 @@
 /*
- *  app_out8.cpp - The application for the 8 channel output acting as a Jung 2118
+ *  app_out8.cpp - The application for the 8 channel output acting as a Jung 2138.10
  *
  *  Copyright (C) 2014-2015 Martin Glueck <martin@mangari.org>
  *
@@ -530,13 +530,13 @@ void delayAppStart()
     for (unsigned int i = 0; i<delayAppStartms; i +=msMultiplier)
     {
         delay(msMultiplier);
-        int a = !digitalRead(PIN_RUN);
-        digitalWrite(PIN_RUN, a); // toggle RUN-LED
+        int a = !digitalRead(APP_OUT8X_PIN_RUN);
+        digitalWrite(APP_OUT8X_PIN_RUN, a); // toggle RUN-LED
     }
 #ifdef DEBUG
-    digitalWrite(PIN_RUN, 1); // switch RUN-LED ON
+    digitalWrite(APP_OUT8X_PIN_RUN, 1); // switch RUN-LED ON
 #else
-    digitalWrite(PIN_RUN, 0); // switch RUN-LED ON
+    digitalWrite(APP_OUT8X_PIN_RUN, 0); // switch RUN-LED ON
 #endif
 }
 
