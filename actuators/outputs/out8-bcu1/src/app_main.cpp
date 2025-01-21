@@ -31,6 +31,9 @@
 #    include <sblib/serial.h>
 #endif
 
+#ifdef DEBUG
+#    include <sblib/timer.h>
+#endif
 
 #ifdef BUSFAIL
     NonVolatileSetting AppNovSetting(0xEE00, 0x100);  // flash-storage for application relevant parameters
@@ -296,6 +299,16 @@ void loop(void)
 #ifdef BUSFAIL
     handleBusfailAction();
 #endif
+
+#ifdef DEBUG
+    static Timeout flashTimeout;
+    if (flashTimeout.expired() || flashTimeout.stopped())
+    {
+        bool state = digitalRead(APP_OUT8X_PIN_INFO);
+        digitalWrite(APP_OUT8X_PIN_INFO, !state);
+        flashTimeout.start(state ? 100 : 900);
+    }
+#endif
 }
 
 /**
@@ -319,6 +332,16 @@ void loop_noapp(void)
 #ifdef BUSFAIL
     printSerialBusVoltage(500);
     handleBusfailAction();
+#endif
+
+#ifdef DEBUG
+    static Timeout flashTimeout;
+    if (flashTimeout.expired() || flashTimeout.stopped())
+    {
+        bool state = digitalRead(APP_OUT8X_PIN_INFO);
+        digitalWrite(APP_OUT8X_PIN_INFO, !state);
+        flashTimeout.start(state ? 250 : 250);
+    }
 #endif
 }
 
