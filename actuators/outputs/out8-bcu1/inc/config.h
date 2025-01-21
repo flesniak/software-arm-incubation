@@ -89,9 +89,9 @@
  *       https://github.com/selfbus/hardware-merged/tree/main/applications_din/in-out_2x-2x_2MU<br>
  *       https://github.com/selfbus/hardware-merged/tree/main/controller_lpc1115/lpc1115_2MU_MID
  */
-// #define APP_OUT_8X_16A_BISTAB_4MU_KICAD
+#define APP_OUT_8X_16A_BISTAB_4MU_KICAD
 // #define APP_OUT_8X_16A_BISTAB_4MU_KICAD_BETA // the engineering prototype
-// #define HAND_ACTUATION_REVERSE_BUTTONS
+#define HAND_ACTUATION_REVERSE_BUTTONS
 
 /*
  *  hand actuation pin configuration
