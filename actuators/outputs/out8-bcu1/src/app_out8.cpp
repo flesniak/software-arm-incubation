@@ -24,6 +24,9 @@
 #   include "hand_actuation.h"
 #endif
 
+#ifdef DEBUG_SERIAL
+#    include <sblib/serial.h>
+#endif
 
 typedef struct ChannelTimeOutTimer {
     Timeout On;
@@ -477,6 +480,9 @@ void checkTimeouts(void)
             if (relays.blocked(btnNumber))
                 relays.clearBlocked(btnNumber);
 
+#ifdef DEBUG_SERIAL
+            serial.println("hand toggle channel ", btnNumber, DEC);
+#endif
             relays.toggleChannel(btnNumber);
         }
     }

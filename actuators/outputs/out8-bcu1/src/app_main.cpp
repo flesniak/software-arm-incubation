@@ -363,12 +363,18 @@ void handleBusfailAction()
 {
     switch (busfailStatus) {
         case BusfailStatus::failed:
+            #ifdef DEBUG_SERIAL
+                serial.println("BusVoltageFail");
+            #endif
             // write application settings to flash
             digitalWrite(APP_OUT8X_PIN_INFO, !saveRelayState());
             stopApplication();
             busfailStatus = BusfailStatus::stopped;
             break;
         case BusfailStatus::returned:
+            #ifdef DEBUG_SERIAL
+                serial.println("BusVoltageReturn");
+            #endif
             //restore application settings
             if (!recallAppData()) // load custom application settings
             {
