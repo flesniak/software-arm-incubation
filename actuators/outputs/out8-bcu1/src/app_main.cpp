@@ -37,6 +37,7 @@
     ApplicationData AppData;
     AppCallback callback;
     AppUsrCallback usrCallback; ///\todo two callbacks? Optimize with busfail integration into the sblib.
+    enum class BusfailStatus {running, failed, stopped, returned} busfailStatus = BusfailStatus::stopped;
 #endif
 
 APP_VERSION("O08.10  ", "5", "12"); // Don't forget to also change the build-variable sw_version
@@ -228,12 +229,17 @@ BcuBase* setup()
 
 #ifdef BUSFAIL
     initApplication(AppData.relaysstate);
+    busfailStatus = BusfailStatus::running;
     startBusVoltageMonitoring(); // needs to be called again, because Release version is using analog_pin.h functions from sblib which break our ADC Interrupts
 #else
     initApplication();
 #endif
     return (&bcu);
 }
+
+#ifdef BUSFAIL
+void handleBusfailAction();
+#endif
 
 /**
  * The main processing loop. Will be called by the Selfbus sblib main().
@@ -252,6 +258,10 @@ void loop(void)
     // Sleep up to 1 millisecond if there is nothing to do
     waitForInterrupt();
     printSerialBusVoltage(500);
+
+#ifdef BUSFAIL
+    handleBusfailAction();
+#endif
 }
 
 /**
@@ -268,6 +278,10 @@ void loop_noapp(void)
 #endif
     waitForInterrupt();
     printSerialBusVoltage(500);
+
+#ifdef BUSFAIL
+    handleBusfailAction();
+#endif
 }
 
 void ResetDefaultApplicationData()
@@ -284,33 +298,49 @@ bool saveRelayState()
     return AppNovSetting.StoreApplData((unsigned char*)&AppData, sizeof(ApplicationData));
 }
 
+void handleBusfailAction()
+{
+    switch (busfailStatus) {
+        case BusfailStatus::failed:
+            // write application settings to flash
+            digitalWrite(APP_OUT8X_PIN_INFO, !saveRelayState());
+            stopApplication();
+            busfailStatus = BusfailStatus::stopped;
+            break;
+        case BusfailStatus::returned:
+            //restore application settings
+            if (!recallAppData()) // load custom application settings
+            {
+                // load default values
+                ResetDefaultApplicationData();
+            }
+            bcu.begin(MANUFACTURER, DEVICETYPE, APPVERSION);
+            initApplication(AppData.relaysstate);
+            busfailStatus = BusfailStatus::running;
+            break;
+        default:
+            break;
+    }
+}
+
 void AppCallback::BusVoltageFail()
 {
     pinMode(APP_OUT8X_PIN_INFO, OUTPUT | OPEN_DRAIN); // even in non DEBUG flash Info LED to display app data storing
     digitalWrite(APP_OUT8X_PIN_INFO, 1);
 
-    // write application settings to flash
-    digitalWrite(APP_OUT8X_PIN_INFO, !saveRelayState());
-    stopApplication();
+    busfailStatus = BusfailStatus::failed;
 
 #ifdef DEBUG
-    digitalWrite(APP_OUT8X_PIN_RUN, 0); // switch RUN-LED off, to save some power
+    digitalWrite(APP_OUT8X_PIN_RUN, 1); // switch RUN-LED off, to save some power
 #endif
 }
 
 void AppCallback::BusVoltageReturn()
 {
 #ifdef DEBUG
-    digitalWrite(APP_OUT8X_PIN_RUN, 1); // switch RUN-LED ON
+    digitalWrite(APP_OUT8X_PIN_RUN, 0); // switch RUN-LED ON
 #endif
-    //restore application settings
-    if (!recallAppData()) // load custom application settings
-    {
-        // load default values
-        ResetDefaultApplicationData();
-    }
-    bcu.begin(MANUFACTURER, DEVICETYPE, APPVERSION);
-    initApplication(AppData.relaysstate);
+    busfailStatus = BusfailStatus::returned;
 }
 
 int AppCallback::convertADmV(int valueAD)
