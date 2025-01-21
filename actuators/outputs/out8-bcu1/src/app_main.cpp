@@ -316,19 +316,35 @@ void AppCallback::BusVoltageReturn()
 
 int AppCallback::convertADmV(int valueAD)
 {
+#ifdef APP_OUT_8X_16A_BISTAB_4MU_KICAD
+    // good approximation between 15 & 30V for the 4TE-ARM controller
+    // using 43k / 6k2 and 2+3 bridged on SJ1
+    if (valueAD > 2056)
+        return 33070;
+    else if (valueAD < 252)
+        return 0;
+
+    const float a = 0.0;
+    const float b = 0.00199302;
+    const float c = 5.70314758;
+    const float d = 12204.62226368;
+#else
     // good approximation between 10 & 30V for the 4TE-ARM controller
     if (valueAD > 2150)
         return 30000;
     else if (valueAD < 872)
         return 0;
-    else
-    {
-        float valueADSquared = sq(valueAD);
-        return      0.00000857674926702488f*valueADSquared*valueAD + // a*x^3
-                   -0.0310784307851376f*valueADSquared +             // b*x^2
-                   47.7234335386816f*valueAD +                       // c*x
-               -14253.9303808124f;                                   // d
-    }
+
+    const float a = 0.00000857674926702488f;
+    const float b = -0.0310784307851376f;
+    const float c = 47.7234335386816f;
+    const float d = -14253.9303808124f;
+#endif
+    float valueADSquared = sq(valueAD);
+    return a*valueADSquared*valueAD + // a*x^3
+           b*valueADSquared +         // b*x^2
+           c*valueAD +                // c*x
+           d;                         // d
     /*
      *  4TE ARM-Controller coefficients found with following measurements:
      *  ---------------------
@@ -364,16 +380,29 @@ int AppCallback::convertADmV(int valueAD)
 
 int AppCallback::convertmVAD(int valuemV)
 {
+#ifdef APP_OUT_8X_16A_BISTAB_4MU_KICAD
+    if (valuemV >= 33070)
+        return 2056;
+    else if (valuemV < 13360)
+        return 0;
+
+    const float a = -1.71740561e-06;
+    const float b = 0.17427461;
+    const float c = -1798.06373933;
+#else
     // good approximation between 10 & 30V for the 4TE-ARM controller
     if (valuemV >= 30184)
         return 2150;
     else if (valuemV < 9542)
         return 0;
-    else
 
-    return   -0.00000214162532145905f*sq(valuemV) + // a*x^2
-              0.146795202310839f*valuemV +          // b*x
-           -339.582791686125f;                      // c
+    const float a = -0.00000214162532145905f;
+    const float b = 0.146795202310839f;
+    const float c = -339.582791686125f;
+#endif
+    return a*sq(valuemV) + // a*x^2
+           b*valuemV +     // b*x
+           c;              // c
     /*
      *  4TE ARM-Controller coefficients found with following measurements:
      *  ---------------------
