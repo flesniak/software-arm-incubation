@@ -85,14 +85,14 @@ void Outputs::setupOutputs(const int* Pins, const unsigned int pinCount)
     for (unsigned int channel = 0; channel < outputCount(); channel++)
     {
 #ifdef DEBUG_SERIAL
-        if (outputPins[channel] == APP_OUT8X_PIN_DEBUG_RX || outputPins[channel] == APP_OUT8X_PIN_DEBUG_TX)
+        if (_outputPins[channel] == APP_OUT8X_PIN_DEBUG_RX || _outputPins[channel] == APP_OUT8X_PIN_DEBUG_TX)
         {
             serial.println("skip output setup for debug pins");
             continue;
         }
 #endif
-        pinMode(outputPins[channel], OUTPUT);
-        digitalWrite(outputPins[channel], 0);
+        pinMode(_outputPins[channel], OUTPUT);
+        digitalWrite(_outputPins[channel], 0);
     }
 }
 

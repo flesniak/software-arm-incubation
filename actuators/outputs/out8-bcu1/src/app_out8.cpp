@@ -548,7 +548,7 @@ void initApplication(int lastRelayState)
     int newRelaystate;
     Outputs::State initialOutputState[NO_OF_CHANNELS];
 
-    relays.setupOutputs(&outputPins[0], NO_OF_OUTPUTS);
+    relays.setupOutputs(outputPins, NO_OF_OUTPUTS);
 
     delayAppStart();
 
