@@ -627,7 +627,6 @@ void stopApplication()
     for (unsigned int i = 0; i < sizeof(outputPins)/sizeof(outputPins[0]); i++)
         digitalWrite(outputPins[0], 0);
 
-
 #ifdef HAND_ACTUATION
     // switch all hand actuation LEDs off, to save some power
     handAct.setallLedState(false);

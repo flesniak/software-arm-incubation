@@ -14,14 +14,11 @@
 #ifdef BUSFAIL
 #    include <sblib/usr_callback.h>
 #    include "bus_voltage.h"
-#    include "app_nov_settings.h"
 #endif
-
-
 
 #ifdef BUSFAIL
 typedef struct ApplicationData {
-    unsigned char relaysstate;         // current relays state
+    unsigned char relaysstate; // current relays state
 } ApplicationData;
 
 class AppCallback: public BusVoltageCallback {
@@ -37,10 +34,5 @@ public:
     virtual void Notify(UsrCallbackType type);
 };
 #endif
-
-
-
-
-
 
 #endif /* INC_APP_MAIN_H_ */

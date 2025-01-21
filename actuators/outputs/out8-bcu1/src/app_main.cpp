@@ -11,7 +11,6 @@
 #include <sblib/analog_pin.h>
 #include "app_main.h"
 #include "app_out8.h"
-#include "com_objs.h"
 
 #ifdef BUSFAIL
 #   include <sblib/math.h>
