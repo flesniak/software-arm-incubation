@@ -128,8 +128,8 @@ void printSerialBusVoltage(const unsigned int onEveryTickMs)
     if (millis() % onEveryTickMs == 0)
     {
         unsigned int valueAD = busVoltageMonitor.valueBusVoltageAD();
-        unsigned int valueADConvertedTwice = callback.convertmVAD(callback.convertADmV(valueAD));
         unsigned int valuemV = callback.convertADmV(valueAD);
+        unsigned int valueADConvertedTwice = callback.convertmVAD(valuemV);
         int diff = int(valueAD - valueADConvertedTwice);
         serial.print("AD;");
         serial.print(valueAD);
@@ -277,9 +277,9 @@ void loop_noapp(void)
     }
 #endif
     waitForInterrupt();
-    printSerialBusVoltage(500);
 
 #ifdef BUSFAIL
+    printSerialBusVoltage(500);
     handleBusfailAction();
 #endif
 }

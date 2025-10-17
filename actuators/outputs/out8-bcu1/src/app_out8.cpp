@@ -328,7 +328,7 @@ static unsigned int _handle_timed_functions(const int objno, const unsigned int 
     unsigned int state = tfsUnknown;
 
     // check that objno is in a valid range
-    if ((objno < COMOBJ_INPUT1) || (objno >= int(sizeof(channel_timeout)/sizeof(channel_timeout[0]))))
+    if (objno < COMOBJ_INPUT1 || objno >= NO_OF_CHANNELS)
         return tfsUnknown;
 
     unsigned int outputState    = relays.channel(objno);
@@ -484,7 +484,7 @@ void checkTimeouts(void)
 
     // check if we can enable PWM
     relays.checkPWM();
-    for (unsigned int objno = 0; objno < (sizeof(channel_timeout)/sizeof(channel_timeout[0])); ++objno)
+    for (unsigned int objno = 0; objno < NO_OF_CHANNELS; ++objno)
     {
         unsigned int offTimedout = channel_timeout[objno].Off.expired();
         unsigned int onTimedout = channel_timeout[objno].On.expired();
@@ -548,16 +548,16 @@ void initApplication(int lastRelayState)
     int newRelaystate;
     Outputs::State initialOutputState[NO_OF_CHANNELS];
 
-    relays.setupOutputs(outputPins, NO_OF_OUTPUTS);
-
     delayAppStart();
+
+    relays.setupOutputs(outputPins, NO_OF_OUTPUTS);
 
     // read & combine initialChannelAction's low & high byte from userEeprom
     // 2 bits for each channel: 0x00=LAST_STATE, 0x01=OPEN, 0x02=CLOSED, e.g. initialChannelAction: 0xAAAA Ch1-8 closed; 0x5555 Ch1-8 open; 0x0000 Ch1-8 last state
     initialChannelActions = ((*(bcu.userEeprom))[APP_RESTORE_AFTER_PL_HI] << 8) | (*(bcu.userEeprom))[APP_RESTORE_AFTER_PL_LO];
 
     newRelaystate = 0x00;
-    for (i=0; i < (sizeof(initialOutputState)/sizeof(initialOutputState[0])); i++)
+    for (i = 0; i < NO_OF_CHANNELS; i++)
     {
         unsigned int ChannelAction = (initialChannelActions >> (i * 2)) & 0x03;
         if (ChannelAction == 0x01)
@@ -578,13 +578,13 @@ void initApplication(int lastRelayState)
     }
 
     // set all output objects according to configured initial output state
-    for (i=COMOBJ_INPUT1; i < (sizeof(initialOutputState)/sizeof(initialOutputState[0])); i++)
+    for (i = COMOBJ_INPUT1; i < NO_OF_CHANNELS; i++)
     {
         unsigned int value = (initialOutputState[i] == Outputs::CLOSED);
         bcu.comObjects->objectSetValue(i, value);
     }
 
-    for (i=COMOBJ_SPECIAL1; i <= COMOBJ_SPECIAL4; i++)
+    for (i = COMOBJ_SPECIAL1; i <= COMOBJ_SPECIAL4; i++)
     {
         bcu.comObjects->objectSetValue(i, (unsigned int) 0); // set all logic objects to false
         bcu.comObjects->requestObjectRead(i); // read values of logic objects (8-11) from the KNX bus
@@ -592,7 +592,7 @@ void initApplication(int lastRelayState)
 
     // according to the jung manual, outputs are switched on/off on startup, ignoring timed functions or logics
     // check logic functions, maybe channels need to be blocked
-    for (i=COMOBJ_INPUT1; i < (sizeof(initialOutputState)/sizeof(initialOutputState[0])); i++)
+    for (i = COMOBJ_INPUT1; i < NO_OF_CHANNELS; i++)
         _handle_logic_function(i, bcu.comObjects->objectRead(i)); // handle the logic functions for the channel
 
     // set the initial relays state, this needs to be done as last operation before real
@@ -612,7 +612,7 @@ void initApplication(int lastRelayState)
 void stopApplication()
 {
     // stop all running timers
-    for (unsigned int i = 0; i < (sizeof(channel_timeout)/sizeof(channel_timeout[0])); i++)
+    for (unsigned int i = 0; i < NO_OF_CHANNELS; i++)
     {
       channel_timeout[i].Off.stop();
       channel_timeout[i].On.stop();
@@ -624,7 +624,7 @@ void stopApplication()
 #endif
 
     //switch off all possible active relay coils, to save some power
-    for (unsigned int i = 0; i < sizeof(outputPins)/sizeof(outputPins[0]); i++)
+    for (unsigned int i = 0; i < NO_OF_OUTPUTS; i++)
         digitalWrite(outputPins[0], 0);
 
 #ifdef HAND_ACTUATION
