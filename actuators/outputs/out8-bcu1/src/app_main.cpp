@@ -146,6 +146,7 @@ void printSerialBusVoltage(const unsigned int onEveryTickMs)
 void startBusVoltageMonitoring()
 {
 #ifdef BUSFAIL
+    static Timeout flashTimeout;
     if (busVoltageMonitor.setup(VBUS_AD_PIN, VBUS_AD_CHANNEL, VBUS_ADC_SAMPLE_FREQ,
                                 VBUS_THRESHOLD_FAILED, VBUS_THRESHOLD_RETURN,
                                 VBUS_VOLTAGE_FAILTIME_MS, VBUS_VOLTAGE_RETURNTIME_MS,
@@ -155,6 +156,12 @@ void startBusVoltageMonitoring()
         while (busVoltageMonitor.busFailed())
         {
             delay(1);
+            if ((flashTimeout.expired() || flashTimeout.stopped()))
+            {
+                bool state = digitalRead(APP_OUT8X_PIN_INFO);
+                digitalWrite(APP_OUT8X_PIN_INFO, !state);
+                flashTimeout.start(state ? 250 : 250);
+            }
 #           ifdef DEBUG
                 digitalWrite(APP_OUT8X_PIN_RUN, !digitalRead(APP_OUT8X_PIN_RUN));
 #           endif
