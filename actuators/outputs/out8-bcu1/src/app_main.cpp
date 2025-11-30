@@ -184,6 +184,19 @@ bool recallAppData()
     return result;
 }
 
+// configure watchdog to trigger after ~3 seconds for the default WDTOSCCTRL setting of 0xA0
+void enableWatchdog()
+{
+    LPC_WDT->TC = 1050000 * 3;
+    LPC_WDT->MOD = 0b011;
+}
+
+void feedWatchdog()
+{
+    LPC_WDT->FEED = 0xAA;
+    LPC_WDT->FEED = 0x55;
+}
+
 /**
  * Initialize the application.
  */
@@ -234,6 +247,11 @@ BcuBase* setup()
 #else
     initApplication();
 #endif
+
+#ifdef WATCHDOG
+    enableWatchdog();
+#endif
+
     return (&bcu);
 }
 
@@ -246,6 +264,10 @@ void handleBusfailAction();
  */
 void loop(void)
 {
+#ifdef WATCHDOG
+    feedWatchdog();
+#endif
+
     int objno;
     // Handle updated communication objects
     while ((objno = bcu.comObjects->nextUpdatedObject()) >= 0)
@@ -270,6 +292,10 @@ void loop(void)
  */
 void loop_noapp(void)
 {
+#ifdef WATCHDOG
+    feedWatchdog();
+#endif
+
 #if defined(IO_TEST) && defined(HAND_ACTUATION)
     if (!bcu.programmingMode())
     {

@@ -54,6 +54,8 @@
                        // https://selfbus.myxwiki.org/xwiki/bin/view/Geräte/Ausgänge/Binärausgang_8x230_16A_4TE
                        // PIO_SDA is used for zero-detect
 
+#define WATCHDOG // configure the watchdog timer to reset the MCU (TODO: convert to build-variable)
+
 /**
  * @def APP_OUT_8X_16A_BISTAB_SEPERATED_4MU
  * If the application hardware is app_out_8x_16A_bistab_seperated_4MU comment this define out
