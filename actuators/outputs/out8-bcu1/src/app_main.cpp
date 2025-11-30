@@ -237,7 +237,12 @@ BcuBase* setup()
     serial.println(".", physicalAddress & 0xFF, DEC);
 #endif
 
-    recallAppData();
+    // load previous relay state, reset to 0 in case of crc mismatch
+    if (!recallAppData()) {
+#ifdef BUSFAIL
+        AppData.relaysstate = 0;
+#endif
+    }
 
 #ifndef BI_STABLE
 #   ifdef ZERO_DETECT
