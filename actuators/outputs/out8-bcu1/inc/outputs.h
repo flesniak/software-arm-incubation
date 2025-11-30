@@ -61,7 +61,7 @@ public:
     unsigned int blocked(unsigned int channel);
     void setBlocked(unsigned int channel);
     void clearBlocked(unsigned int channel);
-    virtual void checkPWM(void);
+    virtual bool checkPWM(void);
     virtual unsigned int updateOutput(unsigned int channel);      // returns true in case a switching action was started which drained the bus
     virtual void updateOutputs(unsigned int delayms = 0);
     void setOutputs(void);
@@ -163,13 +163,18 @@ ALWAYS_INLINE void Outputs::clearBlocked(unsigned int channel)
     _blocked &= ~(1 << channel);
 }
 
-ALWAYS_INLINE void Outputs::checkPWM(void)
+// returns true if timeout has expired and we are back in pwm mode
+ALWAYS_INLINE bool Outputs::checkPWM(void)
 {
-    if(_pwm_timeout.expired())
-    {
-        timer16_0.match(MAT2, PWM_DUTY);
-        //digitalWrite(PIO1_4, 0);
-    }
+    if (_pwm_timeout.started()) {
+        if (_pwm_timeout.expired()) {
+            timer16_0.match(MAT2, PWM_DUTY);
+            //digitalWrite(PIO1_4, 0);
+            return true;
+        } else
+            return false;
+    } else
+        return true;
 }
 
 #ifdef ZERO_DETECT

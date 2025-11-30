@@ -44,7 +44,7 @@ public:
     OutputsBiStable() : Outputs() {};
 
     virtual unsigned int updateOutput(unsigned int channel); // returns true in case a switching action was started which drained the bus
-    virtual void checkPWM(void);
+    virtual bool checkPWM(void);
 };
 
 #ifdef BI_STABLE

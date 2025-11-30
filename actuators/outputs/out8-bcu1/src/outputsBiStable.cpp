@@ -45,13 +45,18 @@ unsigned int OutputsBiStable::updateOutput(unsigned int channel)
     return true;
 }
 
-void OutputsBiStable::checkPWM(void)
+// returns true if relays are idle again (i.e. timeout has expired or has not started at all)
+bool OutputsBiStable::checkPWM(void)
 {
-    if (_pwm_timeout.started () && _pwm_timeout.expired ())
-    {
-        for (unsigned int i = 0; i < outputCount(); i++)
-            digitalWrite (_outputPins[i], 0);
-    }
+    if (_pwm_timeout.started()) {
+        if (_pwm_timeout.expired()) {
+            for (unsigned int i = 0; i < outputCount(); i++)
+                digitalWrite (_outputPins[i], 0);
+            return true;
+        } else
+            return false;
+    } else
+        return true;
 }
 
 #ifdef BI_STABLE

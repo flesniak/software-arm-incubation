@@ -151,13 +151,18 @@ unsigned int Outputs::updateOutput(unsigned int channel)
 
 void Outputs::updateOutputs(unsigned int delayms)
 {
-    for(unsigned int i = 0; i < _channelcount; i++)
+    unsigned int ms;
+    for (unsigned int i = 0; i < _channelcount; i++)
     {
-        if (updateOutput(i) && pendingChanges() && (delayms > PWM_TIMEOUT))
+        if (updateOutput(i) && pendingChanges() && delayms > 0)
         {
-            delay(PWM_TIMEOUT);
-            checkPWM();
-            delay(delayms-PWM_TIMEOUT);
+            ms = delayms;
+            while (!checkPWM()) {
+                delay(1);
+                if (ms > 0)
+                    ms--;
+            }
+            delay(ms);
         }
     }
 }

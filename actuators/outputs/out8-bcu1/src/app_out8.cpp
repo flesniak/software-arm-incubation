@@ -606,7 +606,7 @@ void initApplication(int lastRelayState)
 
     // switch the relays according to newRelaystate and send feedback objects
 
-    _switchObjects();
+    _switchObjects(BETWEEN_CHANNEL_DELAY_MS);
 }
 
 void stopApplication()
