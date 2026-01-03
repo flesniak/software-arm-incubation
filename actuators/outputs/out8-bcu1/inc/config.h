@@ -91,6 +91,7 @@
  */
 // #define APP_OUT_8X_16A_BISTAB_4MU_KICAD
 // #define APP_OUT_8X_16A_BISTAB_4MU_KICAD_BETA // the engineering prototype
+// #define HAND_ACTUATION_REVERSE_BUTTONS
 
 /*
  *  hand actuation pin configuration
@@ -100,7 +101,11 @@
 #   define READBACK_PIN PIN_LT9
 #   define BLINK_TIME 500
     // LedTaster_4TE_3.54 : links oben = Kanal 1 nach unten aufsteigende Kanalnummer ; rechts oben = Kanal 5 ; nach unten aufsteigende Kanalnummer
+#ifndef HAND_ACTUATION_REVERSE_BUTTONS
+    const unsigned int handPins[NO_OF_HAND_PINS] = { PIN_LT8, PIN_LT7, PIN_LT6, PIN_LT5, PIN_LT4, PIN_LT3, PIN_LT2, PIN_LT1 };
+#else
     const unsigned int handPins[NO_OF_HAND_PINS] = { PIN_LT1, PIN_LT2, PIN_LT3, PIN_LT4, PIN_LT5, PIN_LT6, PIN_LT7, PIN_LT8 };
+#endif
 
     // for weatherstation-bim112 see commit 870c9801bea5aa616c22fde29c8219e4cb5f28b6
     // const unsigned int handPins[8] = { PIN_LT5, PIN_LT6, PIN_LT1, PIN_LT2, PIN_LT3, PIN_LT4, PIN_LT7, PIN_LT8 };
