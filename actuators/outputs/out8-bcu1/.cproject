@@ -1894,7 +1894,7 @@
 					<stringMacro name="relay_type" type="VALUE_TEXT" value="BI_STABLE"/>
 					<stringMacro name="hand_actuation" type="VALUE_TEXT" value="HAND_ACTUATION"/>
 					<stringMacro name="bus_fail" type="VALUE_TEXT" value="BUSFAIL"/>
-					<stringMacro name="sw_version" type="VALUE_TEXT" value="5.12"/>
+					<stringMacro name="sw_version" type="VALUE_TEXT" value="5.12a"/>
 				</macros>
 				<externalSettings/>
 				<extensions>
@@ -2764,7 +2764,7 @@
 					<stringMacro name="relay_type" type="VALUE_TEXT" value="BI_STABLE"/>
 					<stringMacro name="hand_actuation" type="VALUE_TEXT" value="HAND_ACTUATION"/>
 					<stringMacro name="bus_fail" type="VALUE_TEXT" value="BUSFAIL"/>
-					<stringMacro name="sw_version" type="VALUE_TEXT" value="5.12"/>
+					<stringMacro name="sw_version" type="VALUE_TEXT" value="5.12a"/>
 				</macros>
 				<externalSettings/>
 				<extensions>

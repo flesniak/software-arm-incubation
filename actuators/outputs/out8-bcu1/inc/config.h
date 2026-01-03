@@ -130,14 +130,14 @@
 // #      define VBUS_THRESHOLD_FAILED 23500 // millivoltage for normal relays
 // #      define VBUS_THRESHOLD_RETURN 24500
 #   else
-#      define VBUS_THRESHOLD_FAILED 25500 // some relays don't work reliable below 24V@15ms,
-                                          // datasheet states 19.2V @ 50ms should work for Hongfa HFE20-1 24-1HSD-L2(359), but not with 15ms!
-#      define VBUS_THRESHOLD_RETURN 27500
+// #      define VBUS_THRESHOLD_FAILED 25500 // some relays don't work reliable below 24V@15ms,
+//                                           // datasheet states 19.2V @ 50ms should work for Hongfa HFE20-1 24-1HSD-L2(359), but not with 15ms!
+// #      define VBUS_THRESHOLD_RETURN 27500
 
        // TODO test these values with 1% tolerance resistors for the voltage divider R3 & R12
-// #      define VBUS_THRESHOLD_FAILED 24500 // some relays don't work reliable below 24V@15ms,
+#      define VBUS_THRESHOLD_FAILED 24500 // some relays don't work reliable below 24V@15ms,
                                           // datasheet states 19.2V @ 50ms should work for Hongfa HFE20-1 24-1HSD-L2(359), but not with 15ms!
-// #      define VBUS_THRESHOLD_RETURN 25500
+#      define VBUS_THRESHOLD_RETURN 25500
 #   endif
 #endif
 
@@ -174,7 +174,7 @@
 
 #ifdef BI_STABLE
 #   define NO_OF_OUTPUTS (NO_OF_CHANNELS * 2)
-#   define BETWEEN_CHANNEL_DELAY_MS 100 // pause in ms between to channels relay switching, to avoid bus drainage
+#   define BETWEEN_CHANNEL_DELAY_MS 150 // pause in ms between to channels relay switching, to avoid bus drainage
 #else
 #   define NO_OF_OUTPUTS (NO_OF_CHANNELS)
 #   define BETWEEN_CHANNEL_DELAY_MS 100 // pause in ms between to channels relay switching, to avoid bus drainage
@@ -227,14 +227,14 @@
 
             // pin configuration for application board "out_8x_16A_bistab_seperated_4MU_kicad" version >= 2.4
             // RESET Pin, SET Pin
-            PIN_IO7,  PIN_IO6,  //  1,  2 => K1 reset/set
-            PIN_IO5,  PIN_IO4,  //  3,  4 => K2 reset/set
-            PIN_IO3,  PIN_IO2,  //  5,  6 => K3 reset/set
-            PIN_IO1,  PIN_PWM,  //  7,  8 => K4 reset/set
             PIN_IO15, PIN_IO14, //  9, 10 => K5 reset/set
             PIN_IO13, PIN_IO12, // 11, 12 => K6 reset/set
             PIN_IO11, PIN_IO10, // 13, 14 => K7 reset/set
-            PIN_IO9,  PIN_IO8   // 15, 16 => K8 reset/set
+            PIN_IO9,  PIN_IO8,  // 15, 16 => K8 reset/set
+            PIN_IO7,  PIN_IO6,  //  1,  2 => K1 reset/set
+            PIN_IO5,  PIN_IO4, //  3,  4 => K2 reset/set
+            PIN_IO3,  PIN_IO2, //  5,  6 => K3 reset/set
+            PIN_IO1,  PIN_PWM  //  7,  8 => K4 reset/set
 
 #           else
 

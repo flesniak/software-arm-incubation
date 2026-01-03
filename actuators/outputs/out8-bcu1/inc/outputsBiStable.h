@@ -14,7 +14,7 @@
 
 #include "outputs.h"
 
-#define ON_DELAY 15 // Hongfa HFE20-1 24-1HSD-L2(359) datasheet
+#define ON_DELAY 20 // Hongfa HFE20-1 24-1HSD-L2(359) datasheet
                     // says "Pulse Duration min. 50ms"
                     // tested on 12/02/2020 ON_DELAY set to:
                     //  4ms, 0 of 8 relays work
